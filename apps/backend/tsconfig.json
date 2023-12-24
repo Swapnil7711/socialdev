@@ -7,6 +7,9 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
+    // "paths": {
+    //   "common": ["../../packages/common/src/index.ts"]  without esbuild this gets complecated
+    // }
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules"]
