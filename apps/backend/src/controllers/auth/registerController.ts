@@ -1,18 +1,31 @@
 import { Request, Response, NextFunction} from "express"
 import {registerSchema} from  "common"
+import { fromZodError } from 'zod-validation-error';
+export interface APIRequestParams {
+    email?:          string;
+    firstName?:      string;
+    lastName?:       string;
+    gender?:         string;
+    password?:       string;
+    repeatpassword?: string;
+}
+
+
 const registerController = {
-    register(req: Request, res:Response, next:NextFunction){
+    async register(req: Request, res:Response, next:NextFunction){
 
         // validate the request with zod or joi
-        try {
-            const result=registerSchema.parse(req.body)
-            console.log("result", result)
-        } catch (error:any) {
-            console.log(error.errors[0].message)
+        const result = registerSchema.safeParse(req.body)
+
+        console.log(result)
+
+        if (!result.success){
+        const validationError = fromZodError(result.error);
+        return next(validationError);
         }
-        
      
         // authorise the request
+        
         // check if user is already in the database
         // prepare model
         // store ion database
