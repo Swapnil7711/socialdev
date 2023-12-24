@@ -1,0 +1,19 @@
+[] register a user
+[] login
+[] profile
+[] add new post
+[] get all post
+[] update post
+[] delete post
+[x] like/dislike post
+[] comment on post
+[] get comments of post
+[] follow another user
+[] unfollow another user
+[] see who follows you
+[] see who are following you
+[] search for users or posts
+[] sort by likes, date etc.
+[] dark mode toggle
+[] logout ].</s>
+

@@ -1,11 +1,11 @@
 import express, {Express} from "express"
 import {PORT} from './config'
+import router from "./routes"
+
+
 const app:Express = express()
 
-
-app.get("/", (req, res,next)=>{
-    res.json({"msg":"message"})
-})
+app.use("/api", router)
 
 app.listen(PORT, ()=>{
     console.log(`app started on ${PORT}`) 
