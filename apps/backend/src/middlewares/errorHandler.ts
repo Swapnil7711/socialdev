@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { DEBUG_MODE } from "../config";
 import { ValidationError } from "zod-validation-error";
+import CustomErrorHandler from "../services/CustomErrorHandler";
 
 const errorHandler = (
   err: Error,
@@ -23,6 +24,14 @@ const errorHandler = (
         message: `${err.message}`,
       });
   }
+
+  if (err instanceof CustomErrorHandler) {
+    statusCode = err.statusCode;
+    data = {
+      message: err.message,
+    };
+  }
+
   return res.status(statusCode).json(data);
 };
 
