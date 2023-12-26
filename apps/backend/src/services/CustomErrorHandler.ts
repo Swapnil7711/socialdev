@@ -14,8 +14,11 @@ class CustomErrorHandler extends Error {
   static wrongCredentials(message: string) {
     return new CustomErrorHandler(401, message);
   }
-  static unAutorised() {
-    return new CustomErrorHandler(422, "You are not authorised");
+  static unAutorised(message: string) {
+    return new CustomErrorHandler(422, message);
+  }
+  static notFound(message: string) {
+    return new CustomErrorHandler(422, message);
   }
 }
 
