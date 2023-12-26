@@ -15,10 +15,10 @@ class CustomErrorHandler extends Error {
     return new CustomErrorHandler(401, message);
   }
   static unAutorised(message: string) {
-    return new CustomErrorHandler(422, message);
+    return new CustomErrorHandler(401, message);
   }
   static notFound(message: string) {
-    return new CustomErrorHandler(422, message);
+    return new CustomErrorHandler(401, message);
   }
 }
 
