@@ -19,8 +19,6 @@ const registerController = {
       return next(validationError);
     }
 
-    // authorise the request
-
     // check if user is already in the database
 
     try {
@@ -29,8 +27,6 @@ const registerController = {
           email: req.body.email,
         },
       });
-
-      console.log("already exists", alreadyExists);
 
       if (alreadyExists) {
         return next(CustomErrorHandler.alreadyExists("User already exists"));
@@ -54,7 +50,6 @@ const registerController = {
           gender: req.body.gender,
         },
       });
-      console.log("new user", newUser);
       // generate jwt token
       accessToken = JwtService.signToken({
         id: newUser.id,

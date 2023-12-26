@@ -10,6 +10,10 @@ class CustomErrorHandler extends Error {
   static alreadyExists(message: string) {
     return new CustomErrorHandler(409, message);
   }
+
+  static wrongCredentials(message: string) {
+    return new CustomErrorHandler(401, message);
+  }
 }
 
 export default CustomErrorHandler;
