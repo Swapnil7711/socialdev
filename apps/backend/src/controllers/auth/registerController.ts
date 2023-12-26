@@ -3,10 +3,9 @@ import { registerSchema } from "common";
 import { fromZodError } from "zod-validation-error";
 import CustomErrorHandler from "../../services/CustomErrorHandler";
 import prisma from "../../utils/prismaClient";
-import { User } from "database";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import JwtService from "../../services/JwtService";
-
+import { UserType } from "@socialdev/types/UserTypes";
 const registerController = {
   async register(
     req: Request,
@@ -25,11 +24,13 @@ const registerController = {
     // check if user is already in the database
 
     try {
-      const alreadyExists: User | null = await prisma.user.findUnique({
+      const alreadyExists: UserType | null = await prisma.user.findUnique({
         where: {
           email: req.body.email,
         },
       });
+
+      console.log("already exists", alreadyExists);
 
       if (alreadyExists) {
         return next(CustomErrorHandler.alreadyExists("User already exists"));
@@ -38,28 +39,28 @@ const registerController = {
       return next(error);
     }
     // hash the password with bcrypt
-    const hashedPassword: string = await bcrypt.hash(req.body.password, 10);
-    console.log("hashedpassword", hashedPassword);
-    // store ion database with prisma
+    const salt = bcrypt.genSaltSync(10);
+    const hashedPassword: string = bcrypt.hashSync(req.body.password, salt);
+
     // IF user creation is successful
     let accessToken: string | undefined;
     try {
-      const newUser: User = await prisma.user.create({
+      const newUser: UserType = await prisma.user.create({
         data: {
           email: req.body.email,
           password: hashedPassword,
           firstName: req.body.firstName,
-          lastname: req.body.lastName,
+          lastName: req.body.lastName,
           gender: req.body.gender,
         },
       });
-
+      console.log("new user", newUser);
       // generate jwt token
       accessToken = JwtService.signToken({
         id: newUser.id,
         email: newUser.email,
         firstName: newUser.firstName,
-        lastname: newUser.lastname,
+        lastName: newUser.lastName,
         gender: newUser.gender,
       });
     } catch (error) {
