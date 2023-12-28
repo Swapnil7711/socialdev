@@ -33,3 +33,18 @@ export const loginSchema = z.object({
 });
 
 export type loginSchemaType = z.infer<typeof loginSchema>;
+
+const MAX_FILE_SIZE = 5000000;
+const ACCEPTED_IMAGE_TYPES = [
+  "image.jpeg",
+  "image.jpg",
+  "image.png",
+  "image.webp",
+];
+
+export const postSchema = z.object({
+  content: z.string(),
+  image: z.any(),
+});
+
+export type postSchemaType = z.infer<typeof postSchema>;

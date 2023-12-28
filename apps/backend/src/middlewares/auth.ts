@@ -7,10 +7,11 @@ const auth = (req: Request, res: Response, next: NextFunction) => {
   if (!token) {
     return next(CustomErrorHandler.unAutorised("You are not authorised"));
   }
-  console.log(token);
   try {
-    const user = JwtService.verifyToken(token);
-    req.body.user = user;
+    console.log(req.body);
+    const result = JwtService.verifyToken(token);
+    req.body.userId = result.id;
+    console.log("authhhh", req.body.userId);
   } catch (error) {
     return next(CustomErrorHandler.unAutorised("You are not authorised"));
   }

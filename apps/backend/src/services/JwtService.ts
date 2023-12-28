@@ -27,7 +27,7 @@ class JwtService {
   static verifyToken(
     token: string | undefined,
     secret: string = "defaultsecret"
-  ) {
+  ): any {
     if (!token) {
       throw new Error("Token is undefined");
     }

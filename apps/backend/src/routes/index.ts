@@ -4,6 +4,7 @@ import {
   registerController,
   loginController,
   userController,
+  postController,
 } from "../controllers/";
 
 const router = express.Router();
@@ -11,5 +12,6 @@ const router = express.Router();
 router.post("/register", registerController.register);
 router.post("/login", loginController.login);
 router.get("/profile", auth, userController.profile);
+router.post("/post", auth, postController.createPost);
 
 export default router;
