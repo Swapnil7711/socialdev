@@ -5,7 +5,7 @@ import CustomErrorHandler from "../../services/CustomErrorHandler";
 import prisma from "../../utils/prismaClient";
 import bcrypt from "bcryptjs";
 import JwtService from "../../services/JwtService";
-import { UserType } from "@socialdev/types/UserTypes";
+import { UserType } from "@socialdev/types/AppTypes";
 
 const registerController = {
   async register(

@@ -1,4 +1,4 @@
-import { UserType } from "@socialdev/types/UserTypes";
+import { UserType } from "@socialdev/types/AppTypes";
 import { Request, Response, NextFunction } from "express";
 import prisma from "../../utils/prismaClient";
 import CustomErrorHandler from "../../services/CustomErrorHandler";

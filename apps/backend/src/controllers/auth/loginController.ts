@@ -4,7 +4,7 @@ import { fromZodError, ZodError } from "zod-validation-error";
 import prisma from "../../utils/prismaClient";
 import CustomErrorHandler from "../../services/CustomErrorHandler";
 import bcrypt from "bcryptjs";
-import { UserType } from "@socialdev/types/UserTypes";
+import { UserType } from "@socialdev/types/AppTypes";
 import JwtService from "../../services/JwtService";
 
 interface ValidationResult<T> {
