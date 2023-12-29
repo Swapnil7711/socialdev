@@ -7,16 +7,14 @@ interface CustomRequest extends Request {
   user?: string; // Replace 'string' with the actual type of your user ID
 }
 
-const auth = (req: CustomRequest, res: Response, next: NextFunction) => {
+const auth = (req: CustomRequest, res: Response, next: NextFunction): void => {
   const token: string | undefined = req.headers.authorization?.split(" ")[1];
   if (!token) {
     return next(CustomErrorHandler.unAutorised("You are not authorised"));
   }
   try {
-    console.log(req.body);
     const result = JwtService.verifyToken(token);
     req.user = result.id;
-    console.log("authhhh", req.user);
   } catch (error) {
     return next(CustomErrorHandler.unAutorised("You are not authorised"));
   }

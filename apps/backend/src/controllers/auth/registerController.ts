@@ -60,12 +60,9 @@ const registerController = {
         gender: newUser.gender,
       });
     } catch (error) {
-      console.log(error);
       return next(error);
     }
     // send response
-    console.log(accessToken);
-
     res.json({ accessToken });
   },
 };

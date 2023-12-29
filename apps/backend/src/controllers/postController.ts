@@ -3,7 +3,7 @@ import multer from "multer";
 import path from "path";
 import CustomErrorHandler from "../services/CustomErrorHandler";
 import { postSchema } from "common";
-import { fromZodError } from "zod-validation-error";
+import { ValidationError, fromZodError } from "zod-validation-error";
 import fs from "fs";
 import { appRoot } from "../../appRoot";
 import prisma from "../utils/prismaClient";
@@ -15,7 +15,7 @@ interface CustomRequest extends Request {
   user?: string; // Replace 'string' with the actual type of your user ID
 }
 
-const storage = multer.diskStorage({
+const storage: multer.StorageEngine = multer.diskStorage({
   destination: (
     req: Request,
     file: Express.Multer.File,
@@ -51,7 +51,7 @@ const postController = {
         return next(CustomErrorHandler.serverError(err));
       }
       //   parese the req.body with zod
-      let filepath = req.file && req.file.path;
+      let filepath: string | undefined = req.file && req.file.path;
 
       const { content, image } = req.body;
 
@@ -69,12 +69,10 @@ const postController = {
             }
           });
         }
-        const validationError = fromZodError(result.error);
+        const validationError: ValidationError = fromZodError(result.error);
         return next(validationError);
       }
       // if no error store data in Db
-
-      console.log(typeof req.user); // returns number
       const userId: number =
         typeof req.user === "number" ? req.user : parseInt(req.user!);
 
@@ -88,7 +86,6 @@ const postController = {
         });
         res.json({ post: createdPost });
       } catch (error) {
-        console.log(error);
         return next(CustomErrorHandler.serverError("Database error"));
       }
     });
