@@ -1,10 +1,11 @@
-[] register a user
-[] login
-[] profile
-[] add new post
-[] get all post
+[*] register a user
+[*] login
+[*] add new post
 [] update post
 [] delete post
+[] get all post along with user profile image and fname and lname
+[] profile
+[] logout
 [x] like/dislike post
 [] comment on post
 [] get comments of post
@@ -13,7 +14,5 @@
 [] see who follows you
 [] see who are following you
 [] search for users or posts
-[] sort by likes, date etc.
 [] dark mode toggle
-[] logout ].</s>
 

@@ -7,8 +7,7 @@ import { ValidationError, fromZodError } from "zod-validation-error";
 import fs from "fs";
 import { appRoot } from "../../appRoot";
 import prisma from "../utils/prismaClient";
-import { Post } from "@socialdev/types/AppTypes";
-// multer config
+import { Post, UserType } from "@socialdev/types/AppTypes";
 
 // Extend the Request type to include the 'user' property
 interface CustomRequest extends Request {
@@ -89,6 +88,87 @@ const postController = {
         return next(CustomErrorHandler.serverError("Database error"));
       }
     });
+  },
+
+  async updatePost(req: CustomRequest, res: Response, next: NextFunction) {
+    // get the postid from param
+    // get the userid from token
+    // only allow user to update its own post.
+    const postId: number = parseInt(req.params.postId);
+    const userId: string | undefined = req.user;
+
+    // extract post from database
+    // check if image is also updated by chacking if imageurl mactches oldpost url. if yes then just upadte the content else update the image as well
+    upload(req, res, async (err) => {
+      if (err) {
+        return next(CustomErrorHandler.serverError(err));
+      }
+      //   parese the req.body with zod
+
+      const { content } = req.body;
+
+      const result = postSchema.safeParse({
+        content,
+      });
+      if (!result.success) {
+        const validationError: ValidationError = fromZodError(result.error);
+        return next(validationError);
+      }
+      // if no error store data in Db
+      const userId: number =
+        typeof req.user === "number" ? req.user : parseInt(req.user!);
+      try {
+        const oldPost: Partial<Post> | null = await prisma.post.findUnique({
+          where: {
+            id: postId,
+          },
+          select: {
+            id: true,
+            content: true,
+            userId: true,
+          },
+        });
+        // const parsedFilePath: string = req.body.image.spit("src/")[1];
+        if (oldPost?.userId !== userId || oldPost?.id !== postId) {
+          return next(
+            CustomErrorHandler.unAutorised(
+              "you are not authorised to update this post"
+            )
+          );
+        }
+        const updatedPost = await prisma.post.update({
+          where: {
+            id: oldPost?.id,
+          },
+          data: {
+            content: req.body.content,
+          },
+        });
+        res.json({ updatedPost: updatedPost });
+      } catch (error) {
+        return next(error);
+      }
+    });
+
+    // ..............................
+  },
+
+  async getAllPosts(req: CustomRequest, res: Response, next: NextFunction) {
+    const allPosts: Partial<Post>[] = await prisma.post.findMany({
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+            gender: true,
+          },
+        },
+      },
+    });
+
+    res.json({ posts: allPosts });
   },
 };
 

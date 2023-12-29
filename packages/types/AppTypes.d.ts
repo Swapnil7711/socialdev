@@ -11,8 +11,8 @@ export interface UserType {
 
 export interface Post {
   id: number;
-  content?: string | null;
-  image?: string | null;
+  content: string | null;
+  image: string | null;
   userId: number;
   likes?: Like[];
   comments?: Comment[];
