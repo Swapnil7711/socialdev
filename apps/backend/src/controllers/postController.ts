@@ -170,6 +170,40 @@ const postController = {
 
     res.json({ posts: allPosts });
   },
+  async deletePost(req: CustomRequest, res: Response, next: NextFunction) {
+    const postId = parseInt(req.params.postId);
+    const userId: number =
+      typeof req.user === "number" ? req.user : parseInt(req.user!);
+    console.log(`postid ${postId} userId ${userId}`);
+    try {
+      const oldPost: Partial<Post> | null = await prisma.post.findUnique({
+        where: {
+          id: postId,
+        },
+        select: {
+          id: true,
+          content: true,
+          userId: true,
+        },
+      });
+      console.log(oldPost);
+      if (oldPost?.userId !== userId || oldPost?.id !== postId) {
+        return next(
+          CustomErrorHandler.unAutorised(
+            "you are not authorised to Delete this post"
+          )
+        );
+      }
+      const result = await prisma.post.delete({
+        where: {
+          id: postId,
+        },
+      });
+      res.json({ deleted: result });
+    } catch (error) {
+      return next(error);
+    }
+  },
 };
 
 export default postController;

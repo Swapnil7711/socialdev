@@ -1,9 +1,9 @@
 [*] register a user
 [*] login
 [*] add new post
-[] update post
-[] delete post
-[] get all post along with user profile image and fname and lname
+[*] update post
+[*] delete post
+[*] get all post along with user profile image and fname and lname
 [] profile
 [] logout
 [x] like/dislike post
