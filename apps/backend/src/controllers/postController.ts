@@ -7,7 +7,13 @@ import { fromZodError } from "zod-validation-error";
 import fs from "fs";
 import { appRoot } from "../../appRoot";
 import prisma from "../utils/prismaClient";
+import { Post } from "@socialdev/types/AppTypes";
 // multer config
+
+// Extend the Request type to include the 'user' property
+interface CustomRequest extends Request {
+  user?: string; // Replace 'string' with the actual type of your user ID
+}
 
 const storage = multer.diskStorage({
   destination: (
@@ -33,7 +39,7 @@ const upload = multer({ storage, limits: { fileSize: 1000000 * 5 } }).single(
 );
 
 const postController = {
-  async createPost(req: Request, res: Response, next: NextFunction) {
+  async createPost(req: CustomRequest, res: Response, next: NextFunction) {
     // first implement multer to handle image upload
     // store image in upload folder.
     // if req.body schema validation fails, remove image from upoad folder.
@@ -41,7 +47,6 @@ const postController = {
     // send response.
     // let filepath: string | undefined;
     upload(req, res, async (err) => {
-      console.log("req body", req.body);
       if (err) {
         return next(CustomErrorHandler.serverError(err));
       }
@@ -50,11 +55,6 @@ const postController = {
 
       const { content, image } = req.body;
 
-      const post: any = {
-        postText: req.body.content,
-        postImage: filepath,
-        user: req.body.userId,
-      };
       const result = postSchema.safeParse({
         content,
         image,
@@ -74,14 +74,23 @@ const postController = {
       }
       // if no error store data in Db
 
-      console.log(`filepath and userID ${filepath} ${req.body.userId}`);
-      // try {
-      //   const post = await prisma.post.create(req.body);
-      //   console.log("post", post);
-      // } catch (error) {
-      //   return next(error);
-      // }
-      res.json({ msg: "hello from post" });
+      console.log(typeof req.user); // returns number
+      const userId: number =
+        typeof req.user === "number" ? req.user : parseInt(req.user!);
+
+      try {
+        const createdPost: Post = await prisma.post.create({
+          data: {
+            content: req.body.content,
+            image: filepath,
+            userId: userId,
+          },
+        });
+        res.json({ post: createdPost });
+      } catch (error) {
+        console.log(error);
+        return next(CustomErrorHandler.serverError("Database error"));
+      }
     });
   },
 };
