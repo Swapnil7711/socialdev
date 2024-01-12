@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction, Express } from "express";
+import { Request, Response, NextFunction } from "express";
 import multer from "multer";
 import path from "path";
 import CustomErrorHandler from "../services/CustomErrorHandler";
@@ -7,7 +7,12 @@ import { ValidationError, fromZodError } from "zod-validation-error";
 import fs from "fs";
 import { appRoot } from "../../appRoot";
 import prisma from "../utils/prismaClient";
-import { Post, UserType } from "@socialdev/types/AppTypes";
+import {
+  CommentTypes,
+  LikeTypes,
+  PostTypes,
+  UserType,
+} from "@socialdev/types/AppTypes";
 
 // Extend the Request type to include the 'user' property
 interface CustomRequest extends Request {
@@ -47,7 +52,7 @@ const postController = {
     // let filepath: string | undefined;
     upload(req, res, async (err) => {
       if (err) {
-        return next(CustomErrorHandler.serverError(err));
+        return next(CustomErrorHandler.serverError("something went wrong"));
       }
       //   parese the req.body with zod
       let filepath: string | undefined = req.file && req.file.path;
@@ -76,7 +81,7 @@ const postController = {
         typeof req.user === "number" ? req.user : parseInt(req.user!);
 
       try {
-        const createdPost: Post = await prisma.post.create({
+        const createdPost: PostTypes = await prisma.post.create({
           data: {
             content: req.body.content,
             image: filepath,
@@ -101,7 +106,7 @@ const postController = {
     // check if image is also updated by chacking if imageurl mactches oldpost url. if yes then just upadte the content else update the image as well
     upload(req, res, async (err) => {
       if (err) {
-        return next(CustomErrorHandler.serverError(err));
+        return next(CustomErrorHandler.serverError("something went wrong"));
       }
       //   parese the req.body with zod
 
@@ -118,20 +123,22 @@ const postController = {
       const userId: number =
         typeof req.user === "number" ? req.user : parseInt(req.user!);
       try {
-        const oldPost: Partial<Post> | null = await prisma.post.findUnique({
-          where: {
-            id: postId,
-          },
-          select: {
-            id: true,
-            content: true,
-            userId: true,
-          },
-        });
+        const oldPost: Partial<PostTypes> | null = await prisma.post.findUnique(
+          {
+            where: {
+              id: postId,
+            },
+            select: {
+              id: true,
+              content: true,
+              userId: true,
+            },
+          }
+        );
         // const parsedFilePath: string = req.body.image.spit("src/")[1];
         if (oldPost?.userId !== userId || oldPost?.id !== postId) {
           return next(
-            CustomErrorHandler.unAutorised(
+            CustomErrorHandler.unAuthorised(
               "you are not authorised to update this post"
             )
           );
@@ -154,17 +161,17 @@ const postController = {
   },
 
   async getAllPosts(req: CustomRequest, res: Response, next: NextFunction) {
-    const allPosts: Partial<Post>[] = await prisma.post.findMany({
+    const allPosts = await prisma.post.findMany({
       include: {
         user: {
           select: {
             id: true,
-            email: true,
             firstName: true,
             lastName: true,
-            gender: true,
           },
         },
+        likes: true,
+        comments: true,
       },
     });
 
@@ -176,7 +183,7 @@ const postController = {
       typeof req.user === "number" ? req.user : parseInt(req.user!);
     console.log(`postid ${postId} userId ${userId}`);
     try {
-      const oldPost: Partial<Post> | null = await prisma.post.findUnique({
+      const oldPost: Partial<PostTypes> | null = await prisma.post.findUnique({
         where: {
           id: postId,
         },
@@ -189,7 +196,7 @@ const postController = {
       console.log(oldPost);
       if (oldPost?.userId !== userId || oldPost?.id !== postId) {
         return next(
-          CustomErrorHandler.unAutorised(
+          CustomErrorHandler.unAuthorised(
             "you are not authorised to Delete this post"
           )
         );
@@ -200,6 +207,45 @@ const postController = {
         },
       });
       res.json({ deleted: result });
+    } catch (error) {
+      return next(error);
+    }
+  },
+
+  async likePost(req: CustomRequest, res: Response, next: NextFunction) {
+    const userId: number =
+      typeof req.user === "number" ? req.user : parseInt(req.user!);
+    const postId: number = parseInt(req.params.postId);
+
+    try {
+      const result: LikeTypes = await prisma.like.create({
+        data: {
+          userId: userId,
+          postId: postId,
+        },
+      });
+
+      res.json({ result: result });
+    } catch (error) {
+      return next(error);
+    }
+  },
+
+  async postComment(req: CustomRequest, res: Response, next: NextFunction) {
+    const userId: number =
+      typeof req.user === "number" ? req.user : parseInt(req.user!);
+    const postId: number = parseInt(req.params.postId);
+
+    try {
+      const result: CommentTypes = await prisma.comment.create({
+        data: {
+          content: req.body.content,
+          userId: userId,
+          postId: postId,
+        },
+      });
+
+      res.json({ result: result });
     } catch (error) {
       return next(error);
     }

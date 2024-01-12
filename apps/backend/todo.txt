@@ -6,7 +6,7 @@
 [*] get all post along with user profile image and fname and lname
 [] profile
 [] logout
-[x] like/dislike post
+[] like/dislike post
 [] comment on post
 [] get comments of post
 [] follow another user

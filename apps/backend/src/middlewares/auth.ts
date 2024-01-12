@@ -10,13 +10,13 @@ interface CustomRequest extends Request {
 const auth = (req: CustomRequest, res: Response, next: NextFunction): void => {
   const token: string | undefined = req.headers.authorization?.split(" ")[1];
   if (!token) {
-    return next(CustomErrorHandler.unAutorised("You are not authorised"));
+    return next(CustomErrorHandler.unAuthorised("You are not authorised"));
   }
   try {
     const result = JwtService.verifyToken(token);
     req.user = result.id;
   } catch (error) {
-    return next(CustomErrorHandler.unAutorised("You are not authorised"));
+    return next(CustomErrorHandler.unAuthorised("You are not authorised"));
   }
 
   next();

@@ -9,13 +9,30 @@ export interface UserType {
   updatedAt: Date;
 }
 
-export interface Post {
+export interface PostTypes {
   id: number;
   content: string | null;
   image: string | null;
   userId: number;
   likes?: Like[];
   comments?: Comment[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface LikeTypes {
+  id: number;
+  postId: number;
+  userId: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CommentTypes {
+  id: number;
+  content: string;
+  postId: number;
+  userId: number;
   createdAt: Date;
   updatedAt: Date;
 }
